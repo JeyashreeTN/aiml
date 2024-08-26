@@ -1,0 +1,86 @@
+import heapq
+
+def greedy_best_first_search(graph, start, goal, heuristic):
+    frontier = []
+    heapq.heappush(frontier, (heuristic[start], start))
+    came_from = {start: None}
+   
+    while frontier:
+        _, current = heapq.heappop(frontier)
+       
+        if current == goal:
+            path = []
+            while current is not None:
+                path.append(current)
+                current = came_from[current]
+            return path[::-1]  
+       
+        for neighbor in graph[current]:
+            if neighbor not in came_from:
+                heapq.heappush(frontier, (heuristic[neighbor], neighbor))
+                came_from[neighbor] = current
+   
+    return None
+
+def a_star_search(graph, start, goal, heuristic):
+    frontier = []
+    heapq.heappush(frontier, (heuristic[start], start))
+    cost_so_far = {start: 0}
+    came_from = {start: None}
+   
+    while frontier:
+        _, current = heapq.heappop(frontier)
+       
+        if current == goal:
+            path = []
+            while current is not None:
+                path.append(current)
+                current = came_from[current]
+            return path[::-1]  
+       
+        for neighbor in graph[current]:
+            new_cost = cost_so_far[current] + graph[current][neighbor]
+           
+            if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                cost_so_far[neighbor] = new_cost
+                priority = new_cost + heuristic[neighbor]
+                heapq.heappush(frontier, (priority, neighbor))
+                came_from[neighbor] = current
+   
+    return None
+
+
+graph = {
+    'A': {'B': 1, 'C': 4},
+    'B': {'D': 2, 'E': 5},
+    'C': {'F': 1, 'G': 2},
+    'D': {'H': 1},
+    'E': {'H': 2},
+    'F': {'H': 6},
+    'G': {'H': 1},
+    'H': {}
+}
+
+
+heuristic = {
+    'A': 6,
+    'B': 5,
+    'C': 3,
+    'D': 2,
+    'E': 1,
+    'F': 4,
+    'G': 2,
+    'H': 0
+}
+
+start = 'A'
+goal = 'H'
+
+
+path_greedy = greedy_best_first_search(graph, start, goal, heuristic)
+print("Greedy Best-First Search path from", start, "to", goal, ":", path_greedy)
+
+
+path_a_star = a_star_search(graph, start, goal, heuristic)
+print("A* Search path from", start, "to", goal, ":", path_a_star)
+
